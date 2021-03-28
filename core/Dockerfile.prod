@@ -9,7 +9,7 @@ COPY requirements.txt /requirements.txt
 RUN pip install --upgrade pip -r /requirements.txt
 
 RUN pip install --upgrade pip setuptools wheel
-RUN python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/mac/cpu/tensorflow-1.5.0-py3-none-any.whl
+RUN python3 -m pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.5.0-py3-none-any.whl
 
 RUN pip install pandas
 RUN pip install python-memcached
