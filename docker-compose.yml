@@ -1,0 +1,91 @@
+version: "3"
+
+services: 
+  backend:
+    build:
+      context: ./core
+      dockerfile: Dockerfile.prod
+    image: backend-image
+    container_name: backend
+    hostname: backend
+    restart: on-failure
+    expose:
+      - "8000"
+    volumes:
+      - .:/core
+      - media_volume:/app/media
+    command: >
+      sh -c "
+              wait-for db:5432 && wait-for rabbit:5672
+              python manage.py makemigrations &&
+              python manage.py migrate &&
+              gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    stdin_open: true
+    tty: true
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbit
+    networks:
+      - shared_network
+
+  rabbit:
+    image: rabbitmq:3-management
+    container_name: rabbit
+    hostname: rabbit
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitAdmin
+      - RABBITMQ_DEFAULT_PASS=CoinPassword
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "5682:5672"
+      - "15682:15672"
+    networks:
+      - shared_network
+
+  worker:
+    image: backend-image
+    restart: on-failure
+    command: >
+      sh -c "celery -A config worker --loglevel=INFO"
+    volumes:
+      - media_volume:/app/media
+    depends_on:
+      - backend
+      - rabbit
+      - db
+    networks:
+      - shared_network
+
+  db:
+    image: postgres:10-alpine
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - shared_network
+
+  nginx:
+    build:
+      ./nginx
+    volumes:
+      - media_volume:/app/media
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
+    networks:
+      - shared_network
+
+volumes:
+  media_volume:
+  postgres_data:
+
+networks:
+  shared_network:
+    driver: bridge

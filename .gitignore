@@ -1,0 +1,11 @@
+/core/config/__pycache__/
+/core/core/__pycache__/
+/core/core/migrations/
+/core/media
+/core/.idea
+
+/core/Dockerfile
+/core/old
+/core/r.txt
+/core/wait-for.sh
+/core/db.sqlite3
