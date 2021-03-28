@@ -9,7 +9,7 @@ COPY requirements.txt /requirements.txt
 RUN pip install --upgrade pip -r /requirements.txt
 
 RUN pip install --upgrade pip setuptools wheel
-RUN python3 -m pip install --upgrade https://github.com/Anacletus/tensorflow-wheels/raw/master/v11.0/tensorflow-1.11.0-cp36-cp36m-linux_x86_64.whl
+RUN python3 -m pip install --upgrade https://github.com/kapilkd13/tensorflow_wheels/blob/master/tensorflow-1.14.1-cp36-cp36m-linux_x86_64.whl
 
 RUN pip install pandas
 RUN pip install python-memcached
